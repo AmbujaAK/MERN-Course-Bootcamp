@@ -12,7 +12,9 @@ export default function Events({ history }){
     const [thumbnail, setThumbnail ] = useState(null)
     const [sport, setSport ] = useState('')
     const [date, setDate ] = useState('')
-    const [errorMessage, setErrorMessage ] = useState(false)
+    const [error, setError ] = useState(false)
+    const [success, setSuccess ] = useState(false)
+    
 
     const preview = useMemo(() => {
         return thumbnail ? URL.createObjectURL(thumbnail):null
@@ -40,14 +42,16 @@ export default function Events({ history }){
                     thumbnail !== null
                 ){
                     await api.post('/event', eventData, { headers: {user_id}})
-                    console.log(eventData)
-                } else {
-                    setErrorMessage(true)
+                    setSuccess(true)
                     setTimeout(()=>{
-                        setErrorMessage(false)
-                    },5000)
+                        setSuccess(false)
+                    },3000)
 
-                    console.log('Missing required data')
+                } else {
+                    setError(true)
+                    setTimeout(()=>{
+                        setError(false)
+                    },3000)
                 }
             } catch (error) {
                 Promise.reject(error)
@@ -94,10 +98,23 @@ export default function Events({ history }){
                     <Input id='date' type='date' value={date} placeholder={'Event date'} onChange={(event) => setDate(event.target.value)}></Input>
                </FormGroup>
 
-                <Button type='submit'>Create event</Button>
+                <FormGroup>
+                    <Button type='submit' className='submit-btn'>Create event</Button>
+                </FormGroup>
+
+                <FormGroup>
+                    <Button 
+                        className='secondary-btn' 
+                        onClick={() => history.push('/dashboard')}>
+                        Go To Dashboard
+                    </Button>
+                </FormGroup>
             </Form>
-            {errorMessage ? (
+            {error ? (
                 <Alert className='event-validation' color='danger'>Missing required information</Alert>
+            ): ''}
+            {success ? (
+                <Alert className='event-validation' color='success'> Event created successfully !</Alert>
             ): ''}
 
         </Container>
