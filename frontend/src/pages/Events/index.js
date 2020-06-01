@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import api from '../../services/api'
-import { Container, Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import { Container, Button, Form, FormGroup, Label, Input, Alert, DropdownToggle, DropdownMenu, DropdownItem,ButtonDropdown } from 'reactstrap';
 import cameraIcon from '../../assets/camera.png'
 import './events.css'
 
@@ -10,10 +10,13 @@ export default function Events({ history }){
     const [description, setDescription ] = useState('')
     const [price, setPrice ] = useState('')
     const [thumbnail, setThumbnail ] = useState(null)
-    const [sport, setSport ] = useState('')
+    const [sport, setSport ] = useState('Sport')
     const [date, setDate ] = useState('')
     const [error, setError ] = useState(false)
     const [success, setSuccess ] = useState(false)
+    const [dropdownOpen, setOpen] = useState(false);
+
+    const toggle = () => setOpen(!dropdownOpen);
     
 
     const preview = useMemo(() => {
@@ -33,34 +36,34 @@ export default function Events({ history }){
         eventData.append('description', description)
         eventData.append('date', date)
         
-            try {
-                if(title !== '' && 
-                    description !== '' && 
-                    sport !== '' && 
-                    price !== '' &&
-                    date !== '' &&
-                    thumbnail !== null
-                ){
-                    await api.post('/event', eventData, { headers: {user_id}})
-                    setSuccess(true)
-                    setTimeout(()=>{
-                        setSuccess(false)
-                    },3000)
+        try {
+            if(title !== '' && 
+                description !== '' && 
+                sport !== 'Sport' && 
+                price !== '' &&
+                date !== '' &&
+                thumbnail !== null
+            ){
+                await api.post('/event', eventData, { headers: {user_id}})
+                setSuccess(true)
+                setTimeout(()=>{
+                    setSuccess(false)
+                },3000)
 
-                } else {
-                    setError(true)
-                    setTimeout(()=>{
-                        setError(false)
-                    },3000)
-                }
-            } catch (error) {
-                Promise.reject(error)
-                console.log(error)
+            } else {
+                setError(true)
+                setTimeout(()=>{
+                    setError(false)
+                },3000)
             }
- 
-        return ''
+        } catch (error) {
+            Promise.reject(error)
+            console.log(error)
+        }
     }
 
+    const sportEventHandler = (sport) => setSport(sport)
+    
     return(
         <Container>
             <h1>Create your events</h1>
@@ -69,13 +72,8 @@ export default function Events({ history }){
                     <Label>Upload Image :</Label>
                     <Label id='thumbnail' style={{backgroundImage : `url(${preview})`}} className={thumbnail ? 'has-thumbnail' : ''}>                
                     <Input type='file' onChange={(event) => setThumbnail(event.target.files[0])}></Input>
-                    <img src={cameraIcon} style={{ maxWidth: '50px'}} alt='upload icon image'/>
+                    <img src={cameraIcon} style={{ maxWidth: '50px'}} alt='upload icon'/>
                     </Label>
-               </FormGroup>
-
-               <FormGroup>
-                    <Label>Sport :</Label>
-                    <Input id='sport' type='text' value={sport} placeholder={'Sprots name'} onChange={(event) => setSport(event.target.value)}></Input>
                </FormGroup>
 
                <FormGroup>
@@ -98,6 +96,18 @@ export default function Events({ history }){
                     <Input id='date' type='date' value={date} placeholder={'Event date'} onChange={(event) => setDate(event.target.value)}></Input>
                </FormGroup>
 
+               <FormGroup>
+                    <ButtonDropdown isOpen={dropdownOpen} toggle={toggle}>
+                        <Button id= 'caret' value={sport} disabled>{sport}</Button>
+                        <DropdownToggle caret />
+                        <DropdownMenu>
+                            <DropdownItem onClick={() => sportEventHandler('running')}>running</DropdownItem>
+                            <DropdownItem onClick={() => sportEventHandler('cycling')}>cycling</DropdownItem>
+                            <DropdownItem onClick={() => sportEventHandler('swimming')}>swimming</DropdownItem>
+                        </DropdownMenu>
+                    </ButtonDropdown>
+                </FormGroup>
+
                 <FormGroup>
                     <Button type='submit' className='submit-btn'>Create event</Button>
                 </FormGroup>
@@ -105,7 +115,7 @@ export default function Events({ history }){
                 <FormGroup>
                     <Button 
                         className='secondary-btn' 
-                        onClick={() => history.push('/dashboard')}>
+                        onClick={() => history.push('/')}>
                         Go To Dashboard
                     </Button>
                 </FormGroup>

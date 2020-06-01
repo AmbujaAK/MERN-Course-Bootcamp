@@ -29,13 +29,13 @@ routes.get('/registration/:registration_id/rejections', RejectionController.reje
 routes.post('/login', LoginController.login)
 
 //Dashboard
-routes.get('/dashboard/event/:eventId', DashboardController.getEventById)
-routes.get('/dashboard/events', DashboardController.getAllEvents)
-routes.get('/dashboard/events/:sport', DashboardController.getAllEvents)
+routes.get('/dashboard', DashboardController.getAllEvents)
+routes.get('/dashboard/:sport', DashboardController.getAllEvents)
+routes.get('/event/:eventId', DashboardController.getEventById)
 
 //Event
 routes.post('/event', upload.single('thumbnail'), EventController.createEvent)
-routes.delete('/events/:eventId', EventController.deleteEventById)
+routes.delete('/event/:eventId', EventController.deleteEventById)
 
 //User
 routes.post('/user/createUser',UserController.createUser)
