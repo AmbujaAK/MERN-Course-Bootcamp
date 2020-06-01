@@ -9,15 +9,9 @@ module.exports = {
 
 			if(event){
 				return res.json(event)
-			} else {
-				return res.status(400).json({
-					message: 'Event ID does not exist!'
-				})	
 			}
 		} catch (error) {
-			return res.status(400).json({
-				message: 'Event ID does not exist!'
-			})
+			return res.status(400).json({message: 'Event ID does not exist!'})
 		}
 	},
 
@@ -32,9 +26,7 @@ module.exports = {
 				return res.json(events)
 			}
 		} catch (error) {
-			return res.status(400).json({
-				message: 'we don\'t have any events!'
-			})
+			return res.status(400).json({message: 'we don\'t have any events!'})
 		}
 	}
 }

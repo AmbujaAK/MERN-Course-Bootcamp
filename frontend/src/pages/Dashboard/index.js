@@ -1,13 +1,55 @@
-import React from 'react'
-
+import React, { useEffect, useState } from 'react'
+import api from '../../services/api'
+import moment from 'moment'
+import { Button, ButtonGroup} from 'reactstrap';
+import './dashboard.css'
 // Dashboard will show all the events
 export default function Dahsboard({ history }){
+    const [events, setEvents] = useState([])
     const user_id = localStorage.getItem('user')
+    const [rSelected, setRSelected] = useState(null);
 
-    console.log(user_id)
+    useEffect((query) => {
+        getEvents(query)
+    },[])
+
+    const filterHandler = (query) => {
+        setRSelected(query)
+        getEvents(query)
+    }
+
+    const getEvents = async (filter) => {
+        console.log('events :' + filter )
+        const url = filter ? `/dashboard/${filter}` : '/dashboard'
+        const response = await api.get(url, {headers: { user_id }})
+
+        setEvents(response.data)
+    }
+    console.log(events)
     return(
-        <div>
-            Hello from Dahsboard
-        </div>
+        <>
+            <div>Filter :
+            <ButtonGroup>
+                <Button color="primary" onClick={() => filterHandler(null)} active={rSelected === null}>All Sports</Button>
+                <Button color="primary" onClick={() => filterHandler('running')} active={rSelected === 'running'}>Running</Button>
+                <Button color="primary" onClick={() => filterHandler('cycling')} active={rSelected === 'cycling'}>Cycling</Button>
+                <Button color="primary" onClick={() => filterHandler('swimming')} active={rSelected === 'swimming'}>Swimming</Button>
+            </ButtonGroup>
+            <Button color='secondary' onClick={() => history.push('events')}>Events</Button>
+            </div>
+            <br/>
+            <ul className='events-list'>
+                {events.map((event)=>(
+                    <li key={event._id}>
+                        <header style={{ backgroundImage: `url(${event.thumbnail_url})`}}></header>
+                        <strong>{event.title}</strong>
+                        <span>Event Date :{moment(event.date).format('l')}</span>
+                        <span>Event Price : {parseFloat(event.price).toFixed(2)}</span>
+                        <span>Event Description :{event.description}</span>
+                        <Button color='primary'>Subscribe</Button>
+                    </li>
+                ))}
+            </ul>
+        </>
     )
 }
