@@ -25,7 +25,7 @@ export default function Events({ history }){
 
     const submitHandler = async (event) => {
         event.preventDefault()
-        const user_id = localStorage.getItem('user')
+        const user = localStorage.getItem('user')
 
         const eventData = new FormData()
 
@@ -44,7 +44,7 @@ export default function Events({ history }){
                 date !== '' &&
                 thumbnail !== null
             ){
-                await api.post('/event', eventData, { headers: {user_id}})
+                await api.post('/event', eventData, { headers: {user}})
                 setSuccess(true)
                 setTimeout(()=>{
                     setSuccess(false)

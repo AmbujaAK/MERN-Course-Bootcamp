@@ -3,10 +3,13 @@ import api from '../../services/api'
 import moment from 'moment'
 import { Alert, Button, ButtonGroup} from 'reactstrap';
 import './dashboard.css'
+
 // Dashboard will show all the events
 export default function Dahsboard({ history }){
     const [events, setEvents] = useState([])
-    const user_id = localStorage.getItem('user')
+    const user = localStorage.getItem('user')
+    const user_id = localStorage.getItem('user_id')
+
     const [rSelected, setRSelected] = useState(null);
     const [error, setError ] = useState(false)
     const [success, setSuccess ] = useState(false)
@@ -22,14 +25,19 @@ export default function Dahsboard({ history }){
     }
 
     const myEventsHandler = async (myevents) => {
-        setRSelected(myevents)
-        const response = await api.get('/user/events', {headers: {user_id}})
-        setEvents(response.data)
+        try {
+            setRSelected(myevents)
+            const response = await api.get('/user/events', {headers: {user: user}})
+
+            setEvents(response.data.events)
+        } catch (error) {
+            history.push('/login')
+        }
     }
 
     const deleteEventHandler = async (eventId) => {
         try {
-            await api.delete(`/event/${eventId}`)
+            await api.delete(`/event/${eventId}`, {headers: {user: user}})
             setSuccess(true)
             setTimeout(()=>{
                 setSuccess(false)
@@ -46,11 +54,14 @@ export default function Dahsboard({ history }){
 
     }
     const getEvents = async (filter) => {
-        console.log('events :' + filter )
-        const url = filter ? `/dashboard/${filter}` : '/dashboard'
-        const response = await api.get(url, {headers: { user_id }})
+        try {
+            const url = filter ? `/dashboard/${filter}` : '/dashboard'
+            const response = await api.get(url, {headers: {user: user}})
 
-        setEvents(response.data)
+            setEvents(response.data.events)
+        } catch (error) {
+            history.push('/login')            
+        }
     }
     console.log(events)
     return(
