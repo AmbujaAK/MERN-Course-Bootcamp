@@ -28,5 +28,20 @@ module.exports = {
 		} catch (error) {
 			return res.status(400).json({message: 'we don\'t have any events!'})
 		}
+	},
+
+	async getEveByUserId(req,res){
+		const { user_id } = req.headers
+		
+		try {
+			const events = await Event.find({user: user_id})
+
+			if(events){
+				return res.json(events)
+			}
+		} catch (error) {
+			return res.status(400).json({message: `we do not have any events with the user_id ${user_id}!`})
+		}
 	}
+
 }
