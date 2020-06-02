@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
+const jwt = require('jsonwebtoken')
 
 module.exports = {
 	async login(req,res){
@@ -22,7 +23,14 @@ module.exports = {
 					lastName: user.lastName,
 					email: user.email
 				}
-				return res.json(userResponse)
+				//return res.json(userResponse)
+
+				return jwt.sign({user: userResponse}, 'secret', (err,token) => {
+					return res.json({
+						user: token,
+						user_id: userResponse._id
+					})
+				})
 			}else{
 				return res.status(200).json({message: 'wrong password! Please try again'})
 			}

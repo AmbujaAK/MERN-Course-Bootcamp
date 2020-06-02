@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -5,11 +7,7 @@ const routes = require('./routes')
 const app = express()
 const path = require('path')
 
-const PORT = process.env.PORT || 8081
-
-if(process.env.NODE_ENV !== 'production'){
-	require('dotenv').config()
-}
+const PORT = process.env.PORT || 9000
 
 app.use(cors())
 app.use(express.json())
