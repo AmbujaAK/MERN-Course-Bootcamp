@@ -63,7 +63,7 @@ export default function Dahsboard({ history }){
             history.push('/login')            
         }
     }
-    console.log(events)
+
     return(
         <>
             <div className='filter-panel'>

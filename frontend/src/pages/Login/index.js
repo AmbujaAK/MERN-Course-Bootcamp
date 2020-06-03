@@ -68,7 +68,7 @@ export default function Login({ history }){
                 </FormGroup>
             </Form>
             {error ? (
-                <Alert className='event-validation' color='danger'>Missing required information</Alert>
+                <Alert className='event-validation' color='danger'>{errorMessage}</Alert>
             ): ''}
         </Container>
     );
