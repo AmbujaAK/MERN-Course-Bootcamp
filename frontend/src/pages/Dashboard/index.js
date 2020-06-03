@@ -64,6 +64,12 @@ export default function Dahsboard({ history }){
         }
     }
 
+    const logoutHandler = () => {
+        localStorage.removeItem('user')
+        localStorage.removeItem('user_id')
+        history.push('/login')
+    }
+
     return(
         <>
             <div className='filter-panel'>
@@ -74,7 +80,10 @@ export default function Dahsboard({ history }){
                     <Button color="primary" onClick={() => filterHandler('cycling')} active={rSelected === 'cycling'}>Cycling</Button>
                     <Button color="primary" onClick={() => filterHandler('swimming')} active={rSelected === 'swimming'}>Swimming</Button>
                 </ButtonGroup>
-                <Button color='secondary' onClick={() => history.push('events')}>Events</Button>
+                <ButtonGroup>
+                    <Button color='secondary' onClick={() => history.push('events')}>Events</Button>
+                    <Button color='danger' onClick={logoutHandler}>Logout</Button>
+                </ButtonGroup>
             </div>
             <br/>
             <ul className='events-list'>
