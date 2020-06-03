@@ -41,7 +41,6 @@ module.exports = {
 				}		
 			}
 		})
-		console.log('token : ' + req.token)
 	},
 
 	async getEveByUserId(req,res){
