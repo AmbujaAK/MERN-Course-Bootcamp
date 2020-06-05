@@ -4,14 +4,14 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const routes = require('./routes')
-const app = express()
 const path = require('path')
-
+const http = require('http')
+const socketio = require('socket.io')
 const PORT = process.env.PORT || 9000
 
-app.use(cors())
-app.use(express.json())
-
+const app = express()
+const server = http.Server(app)
+const io = socketio(server)
 
 try {
 	mongoose.connect(process.env.MONGO_DB_CONNECTION_AK, {
@@ -23,9 +23,26 @@ try {
 	console.log(error)
 }
 
+const connectUsers = {}
+
+io.on('connection', socket =>{
+	const { user } = socket.handshake.query
+
+	connectUsers[user] = socket.id
+})
+
+// app.use()
+app.use((req,res,next) => {
+	req.io = io
+	req.connectUsers = connectUsers
+	return next()
+})
+
+app.use(cors())
+app.use(express.json())
 app.use('/files', express.static(path.resolve(__dirname, '..','files')))
 app.use(routes)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
 	console.log(`Listening on ${PORT}`)
 })

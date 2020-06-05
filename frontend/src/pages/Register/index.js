@@ -9,7 +9,9 @@ export default function Register({ history }){
     const [ lastName, setLastName ] = useState("")
     const [ error, setError ] = useState(false)
     const [ errorMessage, setErrorMessgae] = useState('false')
-    
+    const [ success, setSuccess ] = useState(false)
+    const [ messageHandler, setMessageHandler ] = useState('')
+
     const handleSubmit = async (event) => {
         event.preventDefault()
 
@@ -22,7 +24,7 @@ export default function Register({ history }){
                 localStorage.setItem('user', user)
                 localStorage.setItem('user_id', user_id)
 
-                history.push('/dashboard')
+                history.push('/')
             }else{
                 const { message } = response.data
                 setError(true)
@@ -97,6 +99,10 @@ export default function Register({ history }){
             {error ? (
                 <Alert className='event-validation' color='danger'>{errorMessage}</Alert>
             ): ''}
+            {success ? (
+                <Alert className='event-validation' color='success'>{messageHandler}</Alert>
+            ): ''}
+
         </Container>
     );
 }
