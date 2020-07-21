@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import api from '../../services/api'
 import moment from 'moment'
-import { Alert, Button, ButtonGroup} from 'reactstrap';
+import { Alert, Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu, DropdownToggle} from 'reactstrap';
 import './dashboard.css'
 import socketio from 'socket.io-client'
 
@@ -16,6 +16,12 @@ export default function Dahsboard({ history }){
     const [success, setSuccess ] = useState(false)
     const [messageHandler, setMessageHandler] = useState('')
     const [eventsRequest, setEventsRequest] = useState([])
+    const [dropdownOpen, setDropdownOpen] = useState(false)
+    const [eventRequestMessage, setEventRequestMessage] = useState('')
+    const [eventRequestSuccess, setEventRequestSuccess] = useState(false)
+    
+
+    const toggle = () => setDropdownOpen(!dropdownOpen)
 
 
     useEffect(() => {
@@ -23,7 +29,7 @@ export default function Dahsboard({ history }){
     },[])
 
     const socket = useMemo(() => 
-        socketio('http://localhost:8081', { query: { user: user_id }}),
+        socketio('http://localhost:8080', { query: { user: user_id }}),
         [user_id]
     )
 
@@ -81,12 +87,6 @@ export default function Dahsboard({ history }){
         }
     }
 
-    const logoutHandler = () => {
-        localStorage.removeItem('user')
-        localStorage.removeItem('user_id')
-        history.push('/login')
-    }
-
     const registrationRequestHandler = async (event) => {
         try {
             await api.post(`/registration/${event.id}`, {}, { headers: { user }})
@@ -108,37 +108,82 @@ export default function Dahsboard({ history }){
         }
     }
 
+    const acceptEventHandler = async (eventId) => {
+        try {
+            const response = await api.post(`/registration/${eventId}/approvals`, {}, { headers: { user } })
+
+            setEventRequestSuccess(true)
+            setEventRequestMessage('Event approved successfully !!')
+            removeNotificationFromDashboard(eventId)
+
+            setTimeout(()=>{
+                setEventRequestSuccess(false)
+                setEventRequestMessage('')
+            },2000)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const rejectEventHandler = async (eventId) => {
+        try {
+            const response = await api.post(`/registration/${eventId}/rejections`, {}, { headers: { user } })
+
+            setEventRequestSuccess(true)
+            setEventRequestMessage('Event rejected successfully !!')
+            removeNotificationFromDashboard(eventId)
+            
+            setTimeout(()=>{
+                setEventRequestSuccess(false)
+                setEventRequestMessage('')
+            },2000)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const removeNotificationFromDashboard = (eventId) => {
+        const newEvent = eventsRequest.filter((event) => event._id !== eventId)
+        setEventsRequest(newEvent)
+    }
     return(
         <>
             <ul className='notifications'>
             {eventsRequest.map((request) => {
-                console.log(request)
                 return(
-                    <li key={request.event._id}>
+                    <li key={request._id}>
                         <div>
                             <strong>{request.user.email}</strong> is requesting to register your Event.
                             <strong>{request.event.title}</strong>
                             <ButtonGroup>
-                                <Button color='success' onClick={() => {}}>Accept</Button>
-                                <Button color='danger' onClick={() => {}}>Cancel</Button>
+                                <Button color='success' onClick={() => acceptEventHandler(request._id)}>Accept</Button>
+                                <Button color='danger' onClick={() => rejectEventHandler(request._id)}>Reject</Button>
                             </ButtonGroup>
                         </div>
                     </li>
                 )
             })}
             </ul>
+
+            {eventRequestSuccess 
+            ? <Alert className='event-validation' color='success'>{eventRequestMessage}</Alert>
+            : ""}
+
             <div className='filter-panel'>
-                <ButtonGroup>
-                    <Button color="primary" onClick={() => filterHandler(null)} active={rSelected === null}>All Sports</Button>
-                    <Button color="primary" onClick={myEventsHandler} active={rSelected === 'myevents'}>My Events</Button>
-                    <Button color="primary" onClick={() => filterHandler('running')} active={rSelected === 'running'}>Running</Button>
-                    <Button color="primary" onClick={() => filterHandler('cycling')} active={rSelected === 'cycling'}>Cycling</Button>
-                    <Button color="primary" onClick={() => filterHandler('swimming')} active={rSelected === 'swimming'}>Swimming</Button>
-                </ButtonGroup>
-                <ButtonGroup>
-                    <Button color='secondary' onClick={() => history.push('events')}>Events</Button>
-                    <Button color='danger' onClick={logoutHandler}>Logout</Button>
-                </ButtonGroup>
+                <Dropdown isOpen={dropdownOpen} toggle={toggle}>
+                    <DropdownToggle color="primary" caret>
+                        Filter
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem onClick={() => filterHandler(null)} active={rSelected === null}>All Sports</DropdownItem>
+                        <DropdownItem onClick={myEventsHandler} active={rSelected === 'myevents'}>My Events</DropdownItem>
+                        <DropdownItem onClick={() => filterHandler('running')} active={rSelected === 'running'}>Running</DropdownItem>
+                        <DropdownItem onClick={() => filterHandler('cycling')} active={rSelected === 'cycling'}>Cycling</DropdownItem>
+                        <DropdownItem onClick={() => filterHandler('swimming')} active={rSelected === 'swimming'}>Swimming</DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
             </div>
             <br/>
             <ul className='events-list'>
