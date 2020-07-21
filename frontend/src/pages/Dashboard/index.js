@@ -17,6 +17,9 @@ export default function Dahsboard({ history }){
     const [messageHandler, setMessageHandler] = useState('')
     const [eventsRequest, setEventsRequest] = useState([])
     const [dropdownOpen, setDropdownOpen] = useState(false)
+    const [eventRequestMessage, setEventRequestMessage] = useState('')
+    const [eventRequestSuccess, setEventRequestSuccess] = useState(false)
+    
 
     const toggle = () => setDropdownOpen(!dropdownOpen)
 
@@ -105,25 +108,69 @@ export default function Dahsboard({ history }){
         }
     }
 
+    const acceptEventHandler = async (eventId) => {
+        try {
+            const response = await api.post(`/registration/${eventId}/approvals`, {}, { headers: { user } })
+
+            setEventRequestSuccess(true)
+            setEventRequestMessage('Event approved successfully !!')
+            removeNotificationFromDashboard(eventId)
+
+            setTimeout(()=>{
+                setEventRequestSuccess(false)
+                setEventRequestMessage('')
+            },2000)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const rejectEventHandler = async (eventId) => {
+        try {
+            const response = await api.post(`/registration/${eventId}/rejections`, {}, { headers: { user } })
+
+            setEventRequestSuccess(true)
+            setEventRequestMessage('Event rejected successfully !!')
+            removeNotificationFromDashboard(eventId)
+            
+            setTimeout(()=>{
+                setEventRequestSuccess(false)
+                setEventRequestMessage('')
+            },2000)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const removeNotificationFromDashboard = (eventId) => {
+        const newEvent = eventsRequest.filter((event) => event._id !== eventId)
+        setEventsRequest(newEvent)
+    }
     return(
         <>
             <ul className='notifications'>
             {eventsRequest.map((request) => {
-                console.log(request)
                 return(
-                    <li key={request.event._id}>
+                    <li key={request._id}>
                         <div>
                             <strong>{request.user.email}</strong> is requesting to register your Event.
                             <strong>{request.event.title}</strong>
                             <ButtonGroup>
-                                <Button color='success' onClick={() => {}}>Accept</Button>
-                                <Button color='danger' onClick={() => {}}>Cancel</Button>
+                                <Button color='success' onClick={() => acceptEventHandler(request._id)}>Accept</Button>
+                                <Button color='danger' onClick={() => rejectEventHandler(request._id)}>Reject</Button>
                             </ButtonGroup>
                         </div>
                     </li>
                 )
             })}
             </ul>
+
+            {eventRequestSuccess 
+            ? <Alert className='event-validation' color='success'>{eventRequestMessage}</Alert>
+            : ""}
+
             <div className='filter-panel'>
                 <Dropdown isOpen={dropdownOpen} toggle={toggle}>
                     <DropdownToggle color="primary" caret>
