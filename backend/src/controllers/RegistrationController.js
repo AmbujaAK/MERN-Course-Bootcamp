@@ -26,8 +26,6 @@ module.exports = {
 				registration.eventDate = registration.event.date
 				registration.userEmail = registration.user.email
 				registration.save()
-
-				console.log(registration)
 				
 				const ownerSocket = req.connectUsers[registration.event.user]
 
