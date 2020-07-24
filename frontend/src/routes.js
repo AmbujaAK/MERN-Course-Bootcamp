@@ -4,7 +4,10 @@ import Login from './pages/Login/index'
 import Dashboard from './pages/Dashboard'
 import Register from './pages/Register'
 import Events from './pages/Events'
+import MyRegistration from './pages/MyRegistrations'
+
 import TopNav from './components/TopNav'
+
 
 export default function Routes() {
 	return(
@@ -15,6 +18,7 @@ export default function Routes() {
 				<Route path='/login' exact component={Login}/>
 				<Route path='/register' exact component={Register}/>
 				<Route path='/events' component={Events}/>
+				<Route path='/myregistration' exact component={MyRegistration} />
 			</Switch>
 		</BrowserRouter>
 	)

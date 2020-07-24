@@ -36,6 +36,9 @@ return isLoggedIn ?
             <NavItem>
               <Link to="/">Dashboards</Link>
             </NavItem>
+            <NavItem>
+              <Link to="/myregistrations">My Registration</Link>
+            </NavItem>
           </Nav>
         </Collapse>
       </Navbar>
