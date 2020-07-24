@@ -5,9 +5,6 @@ import { Alert, Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu, Dropd
 import './dashboard.css'
 import socketio from 'socket.io-client'
 
-if(process.env.NODE_ENV !== 'production') {
-	require('dotenv').config()	
-}
 // Dashboard will show all the events
 export default function Dahsboard({ history }){
     const [events, setEvents] = useState([])
@@ -22,13 +19,7 @@ export default function Dahsboard({ history }){
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const [eventRequestMessage, setEventRequestMessage] = useState('')
     const [eventRequestSuccess, setEventRequestSuccess] = useState(false)
-    var BASE_URL = ''
 
-    if(process.env.NODE_ENV !== 'production') {
-        BASE_URL = 'http://localhost:8080'
-    } else {
-        BASE_URL = process.env.API_BASE_URL
-    }
     const toggle = () => setDropdownOpen(!dropdownOpen)
 
 
@@ -37,7 +28,7 @@ export default function Dahsboard({ history }){
     },[])
 
     const socket = useMemo(() => 
-        socketio(BASE_URL, { query: { user: user_id }}),
+        socketio('https://mern-bootcamp-backend.herokuapp.com', { query: { user: user_id }}),
         [user_id]
     )
 
