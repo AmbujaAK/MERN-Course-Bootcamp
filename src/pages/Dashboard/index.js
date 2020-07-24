@@ -5,6 +5,9 @@ import { Alert, Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu, Dropd
 import './dashboard.css'
 import socketio from 'socket.io-client'
 
+if(process.env.NODE_ENV !== 'production') {
+	require('dotenv').config()	
+}
 // Dashboard will show all the events
 export default function Dahsboard({ history }){
     const [events, setEvents] = useState([])
@@ -19,8 +22,13 @@ export default function Dahsboard({ history }){
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const [eventRequestMessage, setEventRequestMessage] = useState('')
     const [eventRequestSuccess, setEventRequestSuccess] = useState(false)
-    
+    var BASE_URL = ''
 
+    if(process.env.NODE_ENV !== 'production') {
+        BASE_URL = 'http://localhost:8080'
+    } else {
+        BASE_URL = process.env.API_BASE_URL
+    }
     const toggle = () => setDropdownOpen(!dropdownOpen)
 
 
@@ -29,7 +37,7 @@ export default function Dahsboard({ history }){
     },[])
 
     const socket = useMemo(() => 
-        socketio('http://localhost:8080', { query: { user: user_id }}),
+        socketio(BASE_URL, { query: { user: user_id }}),
         [user_id]
     )
 
@@ -110,7 +118,7 @@ export default function Dahsboard({ history }){
 
     const acceptEventHandler = async (eventId) => {
         try {
-            const response = await api.post(`/registration/${eventId}/approvals`, {}, { headers: { user } })
+            await api.post(`/registration/${eventId}/approvals`, {}, { headers: { user } })
 
             setEventRequestSuccess(true)
             setEventRequestMessage('Event approved successfully !!')
@@ -128,7 +136,7 @@ export default function Dahsboard({ history }){
 
     const rejectEventHandler = async (eventId) => {
         try {
-            const response = await api.post(`/registration/${eventId}/rejections`, {}, { headers: { user } })
+            await api.post(`/registration/${eventId}/rejections`, {}, { headers: { user } })
 
             setEventRequestSuccess(true)
             setEventRequestMessage('Event rejected successfully !!')
