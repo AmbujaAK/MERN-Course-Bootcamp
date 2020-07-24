@@ -22,6 +22,7 @@ routes.get('/', (req,res)=>{
 
 //Registration
 routes.post('/registration/:eventId', verifyToken, RegistrationController.register)
+routes.get('/registration', verifyToken, RegistrationController.getMyRegistrations)
 routes.get('/registration/:registration_id', RegistrationController.getRegistration)
 routes.post('/registration/:registration_id/approvals', verifyToken, ApprovalController.approval)
 routes.post('/registration/:registration_id/rejections', verifyToken, RejectionController.rejection)
