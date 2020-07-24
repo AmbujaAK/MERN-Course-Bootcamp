@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -7,18 +5,22 @@ const routes = require('./routes')
 const path = require('path')
 const http = require('http')
 const socketio = require('socket.io')
-const PORT = process.env.PORT || 9000
+
+if(process.env.NODE_ENV !== 'production') {
+	require('dotenv').config()	
+}
 
 const app = express()
 const server = http.Server(app)
 const io = socketio(server)
+const PORT = process.env.PORT || 9000
 
 try {
-	mongoose.connect(process.env.MONGO_DB_CONNECTION_AK, {
+	mongoose.connect(process.env.MONGO_DB_CONNECTION, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
-	console.log('MongoDB connected successfully!')
+	console.log("MongoDB connected successfully!")
 } catch (error) {
 	console.log(error)
 }

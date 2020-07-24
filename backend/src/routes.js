@@ -10,10 +10,10 @@ const RegistrationController = require('./controllers/RegistrationController')
 const ApprovalController = require('./controllers/ApprovalController')
 const RejectionController = require('./controllers/RejectionController')
 
-const uploadConfig = require('./config/upload')
-
+//const uploadConfig = require('./config/upload')
+const uploadToS3 = require('./config/s3Uploads')
 const routes = express.Router()
-const upload = multer(uploadConfig)
+//const upload = multer(uploadConfig)
 
 //status
 routes.get('/', (req,res)=>{
@@ -37,7 +37,7 @@ routes.get('/event/:eventId', verifyToken, DashboardController.getEventById)
 routes.get('/user/events', verifyToken, DashboardController.getEveByUserId)
 
 //Event
-routes.post('/event', verifyToken, upload.single('thumbnail'), EventController.createEvent)
+routes.post('/event', verifyToken, uploadToS3.single('thumbnail'), EventController.createEvent)
 routes.delete('/event/:eventId',verifyToken, EventController.deleteEventById)
 
 //User
